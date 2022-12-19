@@ -20,22 +20,22 @@ namespace advent2022
 
         private static void Puzzle1(List<string> input)
         {
-            var count = 0;
             long size = 0;
             var listDir = new List<Dir>();
             var parents = new List<string>();
 
             for (int i = 0; i < input.Count(); i++)
             {
-                var details = input[i].Split(" ");
                 var line = input[i];
+                var details = line.Split(" ");
                 var parentRoute = string.Join("", parents);
                 if (line.StartsWith("$ ls"))
                 {
-                    continue;
+                    continue; // no action
                 } 
                 else if (line.StartsWith("dir"))
                 {
+                    // create directory record
                     listDir.Add(new Dir
                     {
                         Name = $"{parentRoute}{details[1]}",
@@ -45,14 +45,17 @@ namespace advent2022
                 }
                 else if (line.StartsWith("$ cd") && !line.EndsWith(".."))
                 {
+                    // create route record
                     parents.Add(details[2]);
                 }
                 else if (line.StartsWith("$ cd .."))
                 {
+                    // remove route record
                     parents.RemoveAt(parents.Count() -1);
                 }
                 else
                 {
+                    // create file record
                     listDir.Add(new Dir
                     {
                         Name = $"{parentRoute}{details[1]}",
@@ -63,28 +66,30 @@ namespace advent2022
                 }
             }
 
+            // Select all files
             var files = listDir.Where(s => s.File);
 
             foreach (var file in files)
             {
+                // assign file sized to directories
                 AssigneSize(listDir, file);
             }
 
-            foreach (var item in listDir.Where(s => s.Size <= 100000 && !s.File))
-            {
-                size += item.Size;
-                Console.WriteLine($"Result 1: {item.Size}");
-            }
+            // sum sized below 100000
+            size = listDir.Where(s => s.Size <= 100000 && !s.File).Sum(s => s.Size);
             Console.WriteLine($"Result 1: {size}");
         }
 
         private static void AssigneSize(List<Dir> listDir, Dir file)
         {
+            // find matching parent route directory
             var match = listDir.FirstOrDefault(s => s.Name == file.Parent && !s.File);
-            if (match == null)
-                return;
+            if (match == null) return;
 
+            // add file/directory size to matched parent
             match.Size += file.Size;
+
+            // assign size to parent
             AssigneSize(listDir, match);
         }
 
