@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace advent2022
 {
-    // prev guess: 6426
+    // prev guess: 6426, 11480, 8965, 8966
     public static class Day9
     {
         public static void Exec()
@@ -83,24 +83,22 @@ namespace advent2022
                         {
                             posT.Y -= 1;
                         }
-                    }
 
-                    var endH = $"{posH.X}{posH.Y}";
-                    var pos = $"{posT.X}{posT.Y}";
+                        var pos = $"{posT.X}{posT.Y}";
 
-                    //Console.WriteLine($"posh {endH} - post {pos}");
-                    if (posVisited.ContainsKey(pos))
-                    {
-                        posVisited[pos] += 1;
-                    }
-                    else
-                    {
-                        posVisited.Add(pos, 1);
+                        if (posVisited.ContainsKey(pos))
+                        {
+                            posVisited[pos] += 1;
+                        }
+                        else
+                        {
+                            posVisited.Add(pos, 1);
+                        }
                     }
                 }
             }
-
-            Console.WriteLine($"Result 1: {posVisited.Count}");
+            long sum = posVisited.Sum(s => s.Value);
+            Console.WriteLine($"Result 1: {sum}");
         }
 
         private static void Puzzle2(List<string> input)
