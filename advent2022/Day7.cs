@@ -21,6 +21,7 @@ namespace advent2022
         private static void Puzzle1(List<string> input)
         {
             long size = 0;
+            long totalSize = 0;
             var listDir = new List<Dir>();
             var parents = new List<string>();
 
@@ -72,25 +73,36 @@ namespace advent2022
             foreach (var file in files)
             {
                 // assign file sized to directories
-                AssigneSize(listDir, file);
+                AssigneSize(listDir, file, file.Size);
+                totalSize += file.Size;
             }
+            var sizeFree = 70000000 - totalSize;
+            var sizeForUpdate = 30000000 - sizeFree;
+
+            Console.WriteLine($"Total size: {totalSize}");
+            Console.WriteLine($"Size to free up: {sizeFree}");
 
             // sum sized below 100000
             size = listDir.Where(s => s.Size <= 100000 && !s.File).Sum(s => s.Size);
             Console.WriteLine($"Result 1: {size}");
+
+            var orderedToRemove = listDir.Where(s => s.Size >= sizeForUpdate && !s.File)
+                .OrderBy(s => s.Size);
+
+            Console.WriteLine($"Result 2: {orderedToRemove.First().Size}");
         }
 
-        private static void AssigneSize(List<Dir> listDir, Dir file)
+        private static void AssigneSize(List<Dir> listDir, Dir file, long size)
         {
             // find matching parent route directory
             var match = listDir.FirstOrDefault(s => s.Name == file.Parent && !s.File);
             if (match == null) return;
 
             // add file/directory size to matched parent
-            match.Size += file.Size;
+            match.Size += size;
 
             // assign size to parent
-            AssigneSize(listDir, match);
+            AssigneSize(listDir, match, size);
         }
 
         private static void Puzzle2(List<string> input)
