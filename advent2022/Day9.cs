@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace advent2022
 {
-    // prev guess: 6426, 11480, 8965, 8966
+    // prev guess: 6426, 11480, 8965, 8966, 10841
     public static class Day9
     {
         public static void Exec()
@@ -58,8 +58,8 @@ namespace advent2022
                     {
                         //do nothing
                     } 
-                    // H within 1 step from T no need to move
-                    else if(diffX >= -1 && diffX <= 1 && diffY >= -1 && diffY <= 1)
+                    // H adjesent T no need to move (X between -1:1, Y between -1:1)
+                    else if(diffX <= 1 && diffX >= -1 && diffY <= 1 && diffY >= -1)
                     {
                         // do nothing
                     }
