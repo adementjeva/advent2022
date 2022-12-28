@@ -14,7 +14,10 @@ namespace advent2022
             //Day6.Exec();
             //Day7.Exec();
             //Day8.Exec();
-            Day9.Exec();
+            //Day9.Exec();
+            //Day10.Exec();
+            //Day11.Exec();
+            Day12.Exec();
         }
     }
 }
