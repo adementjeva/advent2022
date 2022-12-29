@@ -26,7 +26,6 @@ namespace advent2022
             }
 
             Puzzle1(input);
-           // Puzzle2(input);
         }
 
         private static void Puzzle1(List<string> input)
@@ -41,15 +40,15 @@ namespace advent2022
 
                 for (int j = 0; j < details.Length; j++)
                 {
-                    coordinates.Add($"y{i}x{j}", new Cor() 
-                    { 
-                        Ch = details[j], 
+                    coordinates.Add($"y{i}x{j}", new Cor()
+                    {
+                        Ch = details[j],
                         Value = priorityScore[details[j]],
                         PosX = j,
                         PosY = i
                     });
 
-                    if(details[j] == 'E')
+                    if (details[j] == 'E')
                     {
                         targetCor = new Cor()
                         {
@@ -60,7 +59,7 @@ namespace advent2022
                         };
                     }
 
-                    if(details[j] == 'S')
+                    if (details[j] == 'S')
                     {
                         startCor = new Cor()
                         {
@@ -73,80 +72,88 @@ namespace advent2022
                 }
             }
 
-            var route = new RouteCor()
+            var routes = new List<RouteCor>()
             {
-                CurPosX = startCor.PosX,
-                CurPosY = startCor.PosY,
-                Priority = 0,
-                TriedPositions = new Dictionary<string, bool>(),
-                Route = new List<Cor>() { startCor }
+                new RouteCor
+                {
+                    Route = new List<Cor>(),
+                    CurPositions = startCor,
+                    Priority = 0
+                }
             };
 
-            while (route.Priority < targetCor.Value)
+            var found = false;
+
+            while (!found)
             {
-                var match = new List<Cor>();
-                if (coordinates.ContainsKey($"y{route.CurPosY}x{route.CurPosX - 1}")
-                    && (coordinates[$"y{route.CurPosY}x{route.CurPosX - 1}"].Value == route.Priority
-                    || coordinates[$"y{route.CurPosY}x{route.CurPosX - 1}"].Value == route.Priority + 1))
-                {
-                    match.Add(coordinates[$"y{route.CurPosY}x{route.CurPosX - 1}"]);
-                }
-                if (coordinates.ContainsKey($"y{route.CurPosY - 1}x{route.CurPosX}")
-                    && (coordinates[$"y{route.CurPosY - 1}x{route.CurPosX}"].Value == route.Priority
-                    || coordinates[$"y{route.CurPosY - 1}x{route.CurPosX}"].Value == route.Priority + 1))
-                {
-                    match.Add(coordinates[$"y{route.CurPosY - 1}x{route.CurPosX}"]);
-                }
-                if (coordinates.ContainsKey($"y{route.CurPosY +1}x{route.CurPosX}")
-                    && (coordinates[$"y{route.CurPosY + 1}x{route.CurPosX}"].Value == route.Priority
-                    || coordinates[$"y{route.CurPosY + 1}x{route.CurPosX}"].Value == route.Priority + 1))
-                {
-                    match.Add(coordinates[$"y{route.CurPosY + 1}x{route.CurPosX}"]);
-                }
-                
-                if (coordinates.ContainsKey($"y{route.CurPosY}x{route.CurPosX+1}")
-                    && (coordinates[$"y{route.CurPosY}x{route.CurPosX + 1}"].Value == route.Priority
-                    || coordinates[$"y{route.CurPosY}x{route.CurPosX + 1}"].Value == route.Priority + 1))
-                {
-                    match.Add(coordinates[$"y{route.CurPosY}x{route.CurPosX + 1}"]);
-                }
+                var routeCount = routes.Count;
 
-                // Blocked path
-                
-
-                var nextCor = match.Where(m => !route.Route.Any(r => r.PosX == m.PosX && r.PosY == m.PosY))
-                    .OrderByDescending(s => s.Value)
-                    .FirstOrDefault(s => !route.TriedPositions.ContainsKey($"y{s.PosY}x{s.PosX}"));
-                
-                if(nextCor != null)
+                for (int i = 0; i < routeCount; i++)
                 {
-                    route.CurPosY = nextCor.PosY;
-                    route.CurPosX = nextCor.PosX;
-                    route.Priority = nextCor.Value;
-                    route.Route.Add(nextCor);
+                    var match = new List<Cor>();
+
+                    if (coordinates.ContainsKey($"y{routes[i].CurPositions.PosY + 1}x{routes[i].CurPositions.PosX}")
+                    && (coordinates[$"y{routes[i].CurPositions.PosY + 1}x{routes[i].CurPositions.PosX}"].Value == routes[i].Priority
+                    || coordinates[$"y{routes[i].CurPositions.PosY + 1}x{routes[i].CurPositions.PosX}"].Value == routes[i].Priority + 1))
+                    {
+                        match.Add(coordinates[$"y{routes[i].CurPositions.PosY + 1}x{routes[i].CurPositions.PosX}"]);
+                    }
+
+                    if (coordinates.ContainsKey($"y{routes[i].CurPositions.PosY - 1}x{routes[i].CurPositions.PosX}")
+                    && (coordinates[$"y{routes[i].CurPositions.PosY - 1}x{routes[i].CurPositions.PosX}"].Value == routes[i].Priority
+                    || coordinates[$"y{routes[i].CurPositions.PosY - 1}x{routes[i].CurPositions.PosX}"].Value == routes[i].Priority + 1))
+                    {
+                        match.Add(coordinates[$"y{routes[i].CurPositions.PosY - 1}x{routes[i].CurPositions.PosX}"]);
+                    }
+
+                    if (coordinates.ContainsKey($"y{routes[i].CurPositions.PosY}x{routes[i].CurPositions.PosX + 1}")
+                    && (coordinates[$"y{routes[i].CurPositions.PosY}x{routes[i].CurPositions.PosX + 1}"].Value == routes[i].Priority
+                    || coordinates[$"y{routes[i].CurPositions.PosY}x{routes[i].CurPositions.PosX + 1}"].Value == routes[i].Priority + 1))
+                    {
+                        match.Add(coordinates[$"y{routes[i].CurPositions.PosY}x{routes[i].CurPositions.PosX + 1}"]);
+                    }
+
+                    if (coordinates.ContainsKey($"y{routes[i].CurPositions.PosY}x{routes[i].CurPositions.PosX - 1}")
+                    && (coordinates[$"y{routes[i].CurPositions.PosY}x{routes[i].CurPositions.PosX - 1}"].Value == routes[i].Priority
+                    || coordinates[$"y{routes[i].CurPositions.PosY}x{routes[i].CurPositions.PosX - 1}"].Value == routes[i].Priority + 1))
+                    {
+                        match.Add(coordinates[$"y{routes[i].CurPositions.PosY}x{routes[i].CurPositions.PosX - 1}"]);
+                    }
+
+                    var potentialMatch = match.Where(s => !routes[i].Route.Any(r => r.PosX == s.PosX && r.PosY == s.PosY)).ToList();
+
+                    if (potentialMatch.Any())
+                    {
+                        foreach (var item in potentialMatch)
+                        {
+                            var newRoute = routes[i].Route.ToList();
+                            newRoute.Add(item);
+
+                            var newBranch = new RouteCor
+                            {
+                                CurPositions = item,
+                                Blocked = false,
+                                Priority = item.Value,
+                                Route = newRoute
+                            };
+
+                            routes.Add(newBranch);
+
+                            if (item.Value == 27)
+                                found = true;
+
+                            Console.WriteLine($"{string.Join("", newRoute.Select(s => s.Ch))}");
+                        }                        
+                    }
+
+                    routes[i].Blocked = true;
                 }
-                else
-                {
-                    var prev = route.Route.TakeLast(1).First();
+                routes = routes.Where(s => !s.Blocked).ToList();
 
-                    route.Route.Remove(prev);
-                    route.CurPosY = prev.PosY;
-                    route.CurPosX = prev.PosX;
-                    route.Priority = prev.Value;
-
-                    route.TriedPositions.Add($"y{route.CurPosY}x{route.CurPosX}", true);
-                }
-
-                Console.WriteLine($"{string.Join("", route.Route.Select(s => s.Ch))}");
             }
+            var endRoute = routes.Find(s => s.Priority == 27);
 
-            Console.WriteLine($"Result 1: {route.Route.Count}");
-        }
-
-        private static void Puzzle2(List<string> input)
-        {
-            
-            Console.WriteLine($"Result 2: ");
+            Console.WriteLine($"Result 2: {endRoute.Route.Count}");
         }
         public class Cor
         {
@@ -157,11 +164,10 @@ namespace advent2022
         }
         public class RouteCor 
         {
-            public int CurPosX { get; set; }
-            public int CurPosY { get; set; }
+            public bool Blocked { get; set; }
+            public Cor CurPositions { get; set; }
             public int Priority { get; set; }
             public List<Cor> Route { get; set; }
-            public Dictionary<string, bool> TriedPositions { get; set; }
         }
     }
 }
