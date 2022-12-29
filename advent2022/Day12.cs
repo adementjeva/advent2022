@@ -90,6 +90,8 @@ namespace advent2022
 
                 for (int i = 0; i < routeCount; i++)
                 {
+                    routes[i].Route.Add(routes[i].CurPositions);
+
                     var match = new List<Cor>();
 
                     if (coordinates.ContainsKey($"y{routes[i].CurPositions.PosY + 1}x{routes[i].CurPositions.PosX}")
@@ -126,15 +128,11 @@ namespace advent2022
                     {
                         foreach (var item in potentialMatch)
                         {
-                            var newRoute = routes[i].Route.ToList();
-                            newRoute.Add(item);
-
                             var newBranch = new RouteCor
                             {
                                 CurPositions = item,
-                                Blocked = false,
                                 Priority = item.Value,
-                                Route = newRoute
+                                Route = routes[i].Route.ToList()
                             };
 
                             routes.Add(newBranch);
@@ -142,18 +140,21 @@ namespace advent2022
                             if (item.Value == 27)
                                 found = true;
 
-                            Console.WriteLine($"{string.Join("", newRoute.Select(s => s.Ch))}");
-                        }                        
+                            Console.WriteLine($"{string.Join("", newBranch.Route.Select(s => s.Ch))}");
+                        }
+
+                        if (potentialMatch.First().Value == 27)
+                            found = true;
+
                     }
 
-                    routes[i].Blocked = true;
+                    routes.RemoveAt(i);
                 }
-                routes = routes.Where(s => !s.Blocked).ToList();
 
             }
             var endRoute = routes.Find(s => s.Priority == 27);
 
-            Console.WriteLine($"Result 2: {endRoute.Route.Count}");
+            Console.WriteLine($"Result 1: {endRoute.Route.Count}");
         }
         public class Cor
         {
@@ -164,7 +165,6 @@ namespace advent2022
         }
         public class RouteCor 
         {
-            public bool Blocked { get; set; }
             public Cor CurPositions { get; set; }
             public int Priority { get; set; }
             public List<Cor> Route { get; set; }
